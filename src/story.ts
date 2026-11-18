@@ -119,7 +119,7 @@ safe(() => chats.push({ id: "hello", title: BRAND, icon: iconAv("spark"), previe
     T(`<div class="stats3"><div><b>${tot.dm_contacts}</b><span>people in 1:1 chats</span></div><div><b>${tot.groups}</b><span>active groups</span></div><div><b>${fmt(tot.voice_sent)}</b><span>voice notes sent</span></div></div>`, { wide: true }),
     txt(`Your busiest day was <b>${new Date(D.busiest.day).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</b>: ${fmt(D.busiest.count)} messages, ${fmt(D.busiest.chats[0][1])} of them with ${esc(D.busiest.chats[0][0])}.`),
     out("ok let's see this"),
-    txt("Press → to open the next chat. ${chats.length - 1} stats are waiting on the left."),
+    txt(`Press → to open the next chat. ${chats.length - 1} stats are waiting on the left.`),
   ] }));
 
 safe(() => chats.push({ id: "top-20", title: "Your top 20", icon: iconAv("people"), preview: `#1 ${TOP[0].name}, ${fmt(TOP[0].total)} messages`, status: "1:1 chats only, no groups", day: "Top people",

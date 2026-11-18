@@ -5,6 +5,7 @@ import { analyze, type Stats } from "./analyze";
 import { fromDrop, fromFileList, type Picked } from "./load";
 import { mountStory, BRAND } from "./story";
 import { hideNames } from "./hide";
+import { playIntro, showOpening } from "./intro";
 import "./landing.css";
 
 const PATH = "~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared";
@@ -16,41 +17,63 @@ landing.innerHTML = `
 <main class="land">
   <section class="pitch">
     <p class="brand"><span class="logo" aria-hidden="true"></span>${BRAND}</p>
-    <h1>Your year in chats.</h1>
-    <p class="lede">Your top 20 people, who answers fastest, who keeps you up at night, your most used words, your groups ranked. Built from your WhatsApp, in about 10 seconds.</p>
+    <h1>Your year in <em>chats.</em></h1>
+    <p class="lede">Your top 20 people, who answers fastest, who keeps you up at night, your most used words, your groups ranked. In about 10 seconds.</p>
     <ul class="promise">
-      <li><b>Nothing is uploaded.</b> The whole analysis runs inside this browser tab. There is no server and no account.</li>
+      <li><b>Nothing is uploaded.</b> The whole analysis runs inside this browser tab. No server, no account.</li>
       <li><b>Close the tab and it's gone.</b> We store nothing, not even the results.</li>
     </ul>
     ${isMac ? "" : `<p class="warn">For now this works on a Mac with the WhatsApp Desktop app. Open this page on your Mac.</p>`}
   </section>
-  <section class="steps" aria-labelledby="how">
-    <h2 id="how">3 steps</h2>
-    <ol>
-      <li><b>Install WhatsApp Desktop</b> on your Mac (Mac App Store), link your phone, and wait until your chats appear. It syncs about one year of history.</li>
-      <li><b>Click the button below.</b> In the window, press <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>G</kbd>, paste this path and press <kbd>Enter</kbd>:
-        <span class="path"><code id="path">${PATH}</code><button type="button" id="copy">Copy</button></span>
-        Then click <b>Upload</b> or <b>Select</b>.</li>
-      <li><b>Click Allow</b> if your Mac or browser asks. Your browser says "upload", but the files never leave your computer.</li>
+  <section class="steps" id="drop" aria-label="Connect your chats">
+    <p class="pre"><span>You need <b>WhatsApp Desktop</b> on this Mac, linked to your phone. <a href="https://apps.apple.com/app/whatsapp-messenger/id310633997" rel="noopener">Get it free</a></span></p>
+    <button type="button" class="connect" id="connect">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2z" fill="currentColor"/></svg>
+      Connect WhatsApp
+    </button>
+    <p class="then">We copy the folder location for you. In the window that opens:</p>
+    <ol class="keys" id="keys">
+      <li><span class="n">1</span><span class="k"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>G</kbd></span><span>Go to folder</span></li>
+      <li><span class="n">2</span><span class="k"><kbd>⌘</kbd><kbd>V</kbd></span><span>Paste</span></li>
+      <li><span class="n">3</span><span class="k"><kbd>↵</kbd></span><span>Enter</span></li>
+      <li><span class="n">4</span><span class="k"><kbd>Upload</kbd></span><span>Then Allow if asked</span></li>
     </ol>
-    <label class="drop" id="drop" for="pick">
-      <input type="file" id="pick" webkitdirectory multiple hidden>
-      <span class="drop-cta">Choose the WhatsApp folder</span>
-      <span class="drop-sub">or drag the <code>group.net.whatsapp.WhatsApp.shared</code> folder here</span>
-    </label>
+    <p class="fine">Your browser says "upload", but nothing leaves your Mac.</p>
     <p class="status" id="status" role="status" aria-live="polite"></p>
+    <details id="manual">
+      <summary>Didn't work? Do it by hand</summary>
+      Open Finder, press <kbd>⌘</kbd><kbd>⇧</kbd><kbd>G</kbd> and go to:
+      <span class="path"><code id="path">${PATH}</code><button type="button" id="copy">Copy</button></span>
+      Then drag that folder anywhere on this card.
+    </details>
+    <input type="file" id="pick" webkitdirectory multiple hidden>
   </section>
 </main>
-<footer class="land-foot">Not affiliated with WhatsApp or Meta. Open source soon. Works best in Chrome or Safari on a laptop.</footer>`;
+<footer class="land-foot">Not affiliated with WhatsApp or Meta. Works best in Chrome or Safari on a laptop.</footer>`;
 
 const $ = (id: string) => document.getElementById(id)!;
 const status = (msg: string, err = false) => { $("status").textContent = msg; $("status").classList.toggle("err", err); };
 
+// One click: copy the path, open the picker, light up the keys one by one.
+let keyTimer = 0;
+function animateKeys(on: boolean) {
+  const keys = $("keys"), items = [...keys.querySelectorAll("li")];
+  clearInterval(keyTimer); keys.classList.toggle("live", on); items.forEach(li => li.classList.remove("on"));
+  if (!on || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let i = 0; items[0].classList.add("on");
+  keyTimer = window.setInterval(() => { items.forEach(li => li.classList.remove("on")); i = (i + 1) % items.length; items[i].classList.add("on"); }, 1100);
+}
+$("connect").addEventListener("click", () => {
+  navigator.clipboard?.writeText(PATH).catch(() => ($("manual") as HTMLDetailsElement).open = true);
+  animateKeys(true);
+  ($("pick") as HTMLInputElement).click();
+});
+$("pick").addEventListener("cancel", () => { animateKeys(false); ($("manual") as HTMLDetailsElement).open = true; status("No folder picked. Try again, or use the manual way below."); });
+$("pick").addEventListener("change", e => { animateKeys(false); const f = (e.target as HTMLInputElement).files; if (f?.length) run(() => fromFileList(f)); });
 $("copy").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText(PATH); $("copy").textContent = "Copied"; setTimeout(() => ($("copy").textContent = "Copy"), 1500); }
   catch { getSelection()?.selectAllChildren($("path")); }
 });
-$("pick").addEventListener("change", e => { const f = (e.target as HTMLInputElement).files; if (f?.length) run(() => fromFileList(f)); });
 const drop = $("drop");
 drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
 drop.addEventListener("dragleave", () => drop.classList.remove("over"));
@@ -59,7 +82,6 @@ drop.addEventListener("drop", e => { e.preventDefault(); drop.classList.remove("
 let SQL: Promise<SqlJsStatic> | null = null;
 const sql = () => (SQL ??= initSqlJs({ locateFile: () => wasmUrl }));
 const bytes = async (f: File | null) => (f ? new Uint8Array(await f.arrayBuffer()) : null);
-
 async function open(main: File | null, wal: File | null): Promise<Database | null> {
   const m = await bytes(main);
   if (!m) return null;
@@ -70,19 +92,21 @@ let base: Stats | null = null;
 let hidden = new Set<string>();
 
 async function run(get: () => Picked | Promise<Picked>) {
+  let closeOpening: (() => void) | null = null;
   try {
-    status("Reading your chats…");
     const p = await get();
-    status(`Found your chats (${(p.chat.size / 1e6).toFixed(0)} MB). Counting…`);
-    await new Promise(r => setTimeout(r, 30));
+    closeOpening = showOpening(`${(p.chat.size / 1e6).toFixed(0)} MB of chats`);
+    await new Promise(r => setTimeout(r, 60));
     const chat = await open(p.chat, p.chatWal);
     let contacts: Database | null = null;
     try { contacts = await open(p.contacts, p.contactsWal); } catch { contacts = null; }
     base = analyze({ chat: chat!, contacts, pics: p.pics });
     chat!.close(); contacts?.close();
+    await playIntro(base);
     show();
   } catch (e) {
     console.error(e);
+    closeOpening?.();
     status(e instanceof Error ? e.message : "Something went wrong reading that folder.", true);
   }
 }
@@ -98,7 +122,7 @@ function show() {
   });
 }
 
-// Dev only: ?demo loads a local copy of the database through Vite's /@fs route.
+// Dev only: ?demo=/abs/dir loads a local copy of the database through Vite's /@fs route.
 if (import.meta.env.DEV && location.search.includes("demo=")) {
   const dir = new URLSearchParams(location.search).get("demo")!;
   const f = async (n: string) => { const r = await fetch(`/@fs${dir}/${n}`); return r.ok ? new File([await r.blob()], n) : null; };
