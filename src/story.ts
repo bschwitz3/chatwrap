@@ -1,6 +1,7 @@
 // @ts-nocheck
 // Story UI: each stat is a chat. Ported from the 2026-11-18 prototype.
 import "./story.css";
+import { themeButton, bindTheme } from "./theme";
 export const BRAND = "Chatwrap";
 let onKey = null, onHash = null;
 const longDate = s => new Date(s + "T12:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -15,7 +16,7 @@ root.innerHTML = `
     <div class="side-head">
       <h1>${BRAND}</h1>
       <p id="period"></p>
-      <div class="side-actions"><button type="button" id="hide-btn">Hide people</button><button type="button" id="restart-btn">Load another</button></div>
+      <div class="side-actions"><button type="button" id="hide-btn">Hide people</button><button type="button" id="restart-btn">Load another</button>${themeButton("theme-story")}</div>
     </div>
     <div class="progress" aria-hidden="true"><i id="prog"></i></div>
     <nav class="list" id="list" aria-label="Stats"></nav>
@@ -73,7 +74,7 @@ function av(name, s = 40) {
   if (name === ME) return `<span class="av" style="--s:${s}px;background:var(--green);font-size:${Math.round(s * .3)}px">You</span>`;
   const p = D.pics[name];
   if (p) return `<img class="av" style="--s:${s}px" src="${p}" alt="">`;
-  if (name === "?") return `<span class="av" style="--s:${s}px;background:#3b4a54;color:var(--ink)">?</span>`;
+  if (name === "?") return `<span class="av" style="--s:${s}px;background:var(--raise2);color:var(--ink)">?</span>`;
   return `<span class="av" style="--s:${s}px;background:${hashColor(name)}">${esc(initials(name))}</span>`;
 }
 function iconAv(k, s = 49) { return `<span class="av icon" style="--s:${s}px"><svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg></span>`; }
@@ -236,7 +237,7 @@ safe(() => chats.push({ id: "signature-words", title: "Signature words", icon: i
     T(`<div class="rows">${D.close.map((c, i) => `
       <div class="row" style="grid-template-columns:26px 36px minmax(0,1fr) auto auto">
         <span class="n">${i + 1}</span>${av(c.name, 36)}<span class="nm"><b>${esc(c.name)}</b></span>
-        <span class="chip" style="background:#005c4b"><b>${c.mine ? esc(c.mine.term) : "–"}</b><small>${c.mine ? c.mine.count : ""}</small></span>
+        <span class="chip" style="background:var(--out)"><b>${c.mine ? esc(c.mine.term) : "–"}</b><small>${c.mine ? c.mine.count : ""}</small></span>
         <span class="chip"><b>${c.theirs ? esc(c.theirs.term) : "–"}</b><small>${c.theirs ? c.theirs.count : ""}</small></span>
       </div>`).join("")}</div>`, { wide: true }),
     (() => { const a = D.close.find(c => c.mine && c.theirs && c.mine.term === c.theirs.term);
@@ -291,7 +292,7 @@ function drawYear() {
   const ymax = Math.ceil(Math.max(...ser.flatMap(s => s.data)) / 100) * 100;
   const x = i => L + i * (W - L - R) / (M.length - 1), y = v => Tp + (H - Tp - B) * (1 - v / ymax);
   let g = "";
-  for (let v = 0; v <= ymax; v += ymax / 4) g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#ffffff14"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
+  for (let v = 0; v <= ymax; v += ymax / 4) g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--tint2)"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
   M.forEach((m, i) => g += `<text x="${x(i)}" y="${H - 8}" text-anchor="middle">${monLabel(m)}${m.endsWith("-01") ? " " + m.slice(2, 4) : ""}</text>`);
   const lines = ser.map((s, k) => {
     const pts = s.data.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
@@ -392,4 +393,5 @@ $("hide-dlg").addEventListener("close", () => {
   opts.onHide(new Set([...$("hide-list").querySelectorAll("input:checked")].map(i => i.value)));
 });
 $("restart-btn").addEventListener("click", () => opts.onRestart());
+bindTheme("theme-story");
 }

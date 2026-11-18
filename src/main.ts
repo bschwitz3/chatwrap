@@ -6,23 +6,30 @@ import { fromDrop, fromFileList, type Picked } from "./load";
 import { mountStory, BRAND } from "./story";
 import { hideNames } from "./hide";
 import { playIntro, showOpening } from "./intro";
+import { mountShowcase } from "./showcase";
+import { themeButton, bindTheme } from "./theme";
 import "./landing.css";
 
+// Set COFFEE_URL to a Stripe Payment Link / Buy Me a Coffee page; the button stays hidden while empty.
+const COFFEE_URL = "";
+const coffee = (cls = "coffee") => COFFEE_URL ? `<a class="${cls}" href="${COFFEE_URL}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13v5a6 6 0 01-6 6H10a6 6 0 01-6-6zM17 10h1.5a2.5 2.5 0 010 5H17" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 2.5c0 1.5 1.5 1.5 1.5 3M12 2.5c0 1.5 1.5 1.5 1.5 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Buy me a coffee</a>` : "";
 const PATH = "~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared";
 const landing = document.getElementById("landing")!;
 const storyEl = document.getElementById("story")!;
-const isMac = /Mac/i.test(navigator.platform || navigator.userAgent);
+const ua = navigator.userAgent;
+const isTouchMac = /Mac/i.test(navigator.platform) && navigator.maxTouchPoints > 1; // iPadOS reports "MacIntel"
+const isMobile = /iPhone|iPad|iPod|Android|Mobile/i.test(ua) || isTouchMac;
+const isMac = /Mac/i.test(navigator.platform || ua) && !isMobile;
 
 landing.innerHTML = `
 <main class="land">
   <section class="pitch">
-    <p class="brand"><span class="logo" aria-hidden="true"></span>${BRAND}</p>
-    <h1>Your year in <em>chats.</em></h1>
-    <p class="lede">Your top 20 people, who answers fastest, who keeps you up at night, your most used words, your groups ranked. In about 10 seconds.</p>
-    <ul class="promise">
-      <li><b>Nothing is uploaded.</b> The whole analysis runs inside this browser tab. No server, no account.</li>
-      <li><b>Close the tab and it's gone.</b> We store nothing, not even the results.</li>
-    </ul>
+    <div class="brand-row"><p class="brand"><span class="logo" aria-hidden="true"></span>${BRAND}</p>${themeButton("theme-land")}</div>
+    <h1 class="h-xs">Your year in <em>chats.</em></h1>
+    <p class="sub">19 little stories about you and your people, built from your WhatsApp in 10 seconds.</p>
+    <div class="stage" id="stage" aria-hidden="true"></div>
+    <div class="dots" id="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="chips-row"><span class="pill">Nothing uploaded</span><span class="pill">No account</span><span class="pill">Free</span></div>
   </section>
   <section class="steps" id="drop" aria-label="How to connect">
     <ol class="stepper">
@@ -30,7 +37,9 @@ landing.innerHTML = `
         <span class="dot" aria-hidden="true">1</span>
         <div class="body">
           <h3>Use a Mac with WhatsApp Desktop</h3>
-          ${isMac
+          ${isMobile
+            ? `<p><b>You're on a phone.</b> Chatwrap reads your chats from the WhatsApp Desktop app, so it needs a Mac. Send this link to yourself and open it there.</p><button type="button" class="share" id="share">Send this link to my Mac</button>`
+            : isMac
             ? `<p>You're on a Mac. Make sure the <b>WhatsApp Desktop</b> app is installed, linked to your phone, and your chats are visible. <a href="https://apps.apple.com/app/whatsapp-messenger/id310633997" rel="noopener">Get it free</a></p>`
             : `<p><b>This only works on a Mac for now.</b> On Windows, WhatsApp encrypts its chat data, so a website can't read it. Open this page on a Mac with WhatsApp Desktop installed.</p>`}
         </div>
@@ -68,11 +77,11 @@ landing.innerHTML = `
       </li>
     </ol>
     <p class="status" id="status" role="status" aria-live="polite"></p>
-    <p class="fine">Or drag the <code>group.net.whatsapp.WhatsApp.shared</code> folder from Finder onto this card.</p>
+    <p class="fine drag">Or drag the <code>group.net.whatsapp.WhatsApp.shared</code> folder from Finder onto this card.</p>
     <input type="file" id="pick" webkitdirectory multiple hidden>
   </section>
 </main>
-<footer class="land-foot">Not affiliated with WhatsApp or Meta. Works best in Chrome or Safari on a laptop.</footer>`;
+<footer class="land-foot"><span>Not affiliated with WhatsApp or Meta. Works best in Chrome or Safari on a laptop.</span>${coffee()}</footer>`;
 
 const $ = (id: string) => document.getElementById(id)!;
 const status = (msg: string, err = false) => { $("status").textContent = msg; $("status").classList.toggle("err", err); };
@@ -86,6 +95,15 @@ function animateKeys(on: boolean) {
   let i = 0; items[0].classList.add("on");
   keyTimer = window.setInterval(() => { items.forEach(li => li.classList.remove("on")); i = (i + 1) % items.length; items[i].classList.add("on"); }, 1100);
 }
+mountShowcase($("stage"), $("dots"));
+bindTheme("theme-land");
+document.getElementById("share")?.addEventListener("click", async () => {
+  const url = location.origin, b = $("share");
+  try {
+    if (navigator.share) await navigator.share({ title: BRAND, text: "Open this on my Mac", url });
+    else { await navigator.clipboard.writeText(url); b.textContent = "Link copied ✓"; }
+  } catch { /* user closed the share sheet */ }
+});
 const stepTo = (n: number) => {
   for (let i = 2; i <= 4; i++) { const li = $("st" + i); li.classList.toggle("done", i < n); li.classList.toggle("active", i === n || (n === 4 && i === 3)); }
 };
