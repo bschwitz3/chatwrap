@@ -46,6 +46,13 @@ landing.innerHTML = `
         <span class="dot" aria-hidden="true">3</span>
         <div class="body">
           <h3>Click Connect WhatsApp</h3>
+          <p>In the window that opens, you'll do this:</p>
+          <ol class="keys" id="keys">
+            <li><span class="k"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>G</kbd></span><span>Go to folder</span></li>
+            <li><span class="k"><kbd>⌘</kbd><kbd>V</kbd></span><span>Paste</span></li>
+            <li><span class="k"><kbd>↵</kbd></span><span>Enter</span></li>
+            <li><span class="k"><kbd>Upload</kbd></span><span>Click it</span></li>
+          </ol>
           <button type="button" class="connect" id="connect">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2z" fill="currentColor"/></svg>
             Connect WhatsApp
@@ -54,18 +61,6 @@ landing.innerHTML = `
       </li>
       <li class="st" id="st4">
         <span class="dot" aria-hidden="true">4</span>
-        <div class="body">
-          <h3>In the window that opens</h3>
-          <ol class="keys" id="keys">
-            <li><span class="k"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>G</kbd></span><span>Go to folder</span></li>
-            <li><span class="k"><kbd>⌘</kbd><kbd>V</kbd></span><span>Paste</span></li>
-            <li><span class="k"><kbd>↵</kbd></span><span>Enter</span></li>
-            <li><span class="k"><kbd>Upload</kbd></span><span>Click it</span></li>
-          </ol>
-        </div>
-      </li>
-      <li class="st" id="st5">
-        <span class="dot" aria-hidden="true">5</span>
         <div class="body">
           <h3>Click Allow if asked</h3>
           <p>Your browser or Mac may ask for permission. The browser says "upload", but nothing leaves your Mac.</p>
@@ -92,7 +87,7 @@ function animateKeys(on: boolean) {
   keyTimer = window.setInterval(() => { items.forEach(li => li.classList.remove("on")); i = (i + 1) % items.length; items[i].classList.add("on"); }, 1100);
 }
 const stepTo = (n: number) => {
-  for (let i = 2; i <= 5; i++) { const li = $("st" + i); li.classList.toggle("done", i < n); li.classList.toggle("active", i >= n && (i === n || (n >= 4 && i <= 5))); }
+  for (let i = 2; i <= 4; i++) { const li = $("st" + i); li.classList.toggle("done", i < n); li.classList.toggle("active", i === n || (n === 4 && i === 3)); }
 };
 let copied = false;
 async function copyPath() {

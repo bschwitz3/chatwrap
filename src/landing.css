@@ -99,10 +99,11 @@ summary { cursor: pointer; color: var(--l-ink); }
 .st a { color: var(--l-accent); }
 .st .path { margin: 4px 0 0; }
 .st .path button { background: var(--l-accent); color: #0b141a; }
-.st .connect { width: 100%; margin-top: 4px; font-size: 21px; padding: 16px 22px; }
+.st .connect { width: 100%; margin-top: 12px; font-size: 21px; padding: 16px 22px; }
 .st:not(.active) .connect { box-shadow: none; }
 .keys { grid-template-columns: repeat(4, 1fr); }
 .keys li { padding: 12px 4px 10px; }
+.st .keys { margin-top: 8px; }
 .land:has(.st.blocked) #st2, .land:has(.st.blocked) #st3, .land:has(.st.blocked) #st4, .land:has(.st.blocked) #st5 { opacity: .3; pointer-events: none; }
 .fine code { font-size: 12px; }
 @media (prefers-reduced-motion: reduce) { .st { transition: none; } }
