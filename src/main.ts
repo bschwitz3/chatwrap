@@ -23,29 +23,57 @@ landing.innerHTML = `
       <li><b>Nothing is uploaded.</b> The whole analysis runs inside this browser tab. No server, no account.</li>
       <li><b>Close the tab and it's gone.</b> We store nothing, not even the results.</li>
     </ul>
-    ${isMac ? "" : `<p class="warn">For now this works on a Mac with the WhatsApp Desktop app. Open this page on your Mac.</p>`}
   </section>
-  <section class="steps" id="drop" aria-label="Connect your chats">
-    <p class="pre"><span>You need <b>WhatsApp Desktop</b> on this Mac, linked to your phone. <a href="https://apps.apple.com/app/whatsapp-messenger/id310633997" rel="noopener">Get it free</a></span></p>
-    <button type="button" class="connect" id="connect">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2z" fill="currentColor"/></svg>
-      Connect WhatsApp
-    </button>
-    <p class="then">We copy the folder location for you. In the window that opens:</p>
-    <ol class="keys" id="keys">
-      <li><span class="n">1</span><span class="k"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>G</kbd></span><span>Go to folder</span></li>
-      <li><span class="n">2</span><span class="k"><kbd>⌘</kbd><kbd>V</kbd></span><span>Paste</span></li>
-      <li><span class="n">3</span><span class="k"><kbd>↵</kbd></span><span>Enter</span></li>
-      <li><span class="n">4</span><span class="k"><kbd>Upload</kbd></span><span>Then Allow if asked</span></li>
+  <section class="steps" id="drop" aria-label="How to connect">
+    <ol class="stepper">
+      <li class="st ${isMac ? "done" : "blocked"}" id="st1">
+        <span class="dot" aria-hidden="true">1</span>
+        <div class="body">
+          <h3>Use a Mac with WhatsApp Desktop</h3>
+          ${isMac
+            ? `<p>You're on a Mac. Make sure the <b>WhatsApp Desktop</b> app is installed, linked to your phone, and your chats are visible. <a href="https://apps.apple.com/app/whatsapp-messenger/id310633997" rel="noopener">Get it free</a></p>`
+            : `<p><b>This only works on a Mac for now.</b> On Windows, WhatsApp encrypts its chat data, so a website can't read it. Open this page on a Mac with WhatsApp Desktop installed.</p>`}
+        </div>
+      </li>
+      <li class="st ${isMac ? "active" : ""}" id="st2">
+        <span class="dot" aria-hidden="true">2</span>
+        <div class="body">
+          <h3>Copy the folder location</h3>
+          <span class="path"><code id="path">${PATH}</code><button type="button" id="copy">Copy</button></span>
+        </div>
+      </li>
+      <li class="st" id="st3">
+        <span class="dot" aria-hidden="true">3</span>
+        <div class="body">
+          <h3>Click Connect WhatsApp</h3>
+          <button type="button" class="connect" id="connect">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2z" fill="currentColor"/></svg>
+            Connect WhatsApp
+          </button>
+        </div>
+      </li>
+      <li class="st" id="st4">
+        <span class="dot" aria-hidden="true">4</span>
+        <div class="body">
+          <h3>In the window that opens</h3>
+          <ol class="keys" id="keys">
+            <li><span class="k"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>G</kbd></span><span>Go to folder</span></li>
+            <li><span class="k"><kbd>⌘</kbd><kbd>V</kbd></span><span>Paste</span></li>
+            <li><span class="k"><kbd>↵</kbd></span><span>Enter</span></li>
+            <li><span class="k"><kbd>Upload</kbd></span><span>Click it</span></li>
+          </ol>
+        </div>
+      </li>
+      <li class="st" id="st5">
+        <span class="dot" aria-hidden="true">5</span>
+        <div class="body">
+          <h3>Click Allow if asked</h3>
+          <p>Your browser or Mac may ask for permission. The browser says "upload", but nothing leaves your Mac.</p>
+        </div>
+      </li>
     </ol>
-    <p class="fine">Your browser says "upload", but nothing leaves your Mac.</p>
     <p class="status" id="status" role="status" aria-live="polite"></p>
-    <details id="manual">
-      <summary>Didn't work? Do it by hand</summary>
-      Open Finder, press <kbd>⌘</kbd><kbd>⇧</kbd><kbd>G</kbd> and go to:
-      <span class="path"><code id="path">${PATH}</code><button type="button" id="copy">Copy</button></span>
-      Then drag that folder anywhere on this card.
-    </details>
+    <p class="fine">Or drag the <code>group.net.whatsapp.WhatsApp.shared</code> folder from Finder onto this card.</p>
     <input type="file" id="pick" webkitdirectory multiple hidden>
   </section>
 </main>
@@ -63,17 +91,22 @@ function animateKeys(on: boolean) {
   let i = 0; items[0].classList.add("on");
   keyTimer = window.setInterval(() => { items.forEach(li => li.classList.remove("on")); i = (i + 1) % items.length; items[i].classList.add("on"); }, 1100);
 }
+const stepTo = (n: number) => {
+  for (let i = 2; i <= 5; i++) { const li = $("st" + i); li.classList.toggle("done", i < n); li.classList.toggle("active", i >= n && (i === n || (n >= 4 && i <= 5))); }
+};
+let copied = false;
+async function copyPath() {
+  try { await navigator.clipboard.writeText(PATH); copied = true; $("copy").textContent = "Copied ✓"; }
+  catch { getSelection()?.selectAllChildren($("path")); $("copy").textContent = "Press ⌘C"; }
+}
+$("copy").addEventListener("click", async () => { await copyPath(); stepTo(3); });
 $("connect").addEventListener("click", () => {
-  navigator.clipboard?.writeText(PATH).catch(() => ($("manual") as HTMLDetailsElement).open = true);
-  animateKeys(true);
+  if (!copied) navigator.clipboard?.writeText(PATH).then(() => { copied = true; $("copy").textContent = "Copied ✓"; }).catch(() => {});
+  stepTo(4); animateKeys(true);
   ($("pick") as HTMLInputElement).click();
 });
-$("pick").addEventListener("cancel", () => { animateKeys(false); ($("manual") as HTMLDetailsElement).open = true; status("No folder picked. Try again, or use the manual way below."); });
+$("pick").addEventListener("cancel", () => { animateKeys(false); stepTo(3); status("No folder picked. Click Connect WhatsApp again."); });
 $("pick").addEventListener("change", e => { animateKeys(false); const f = (e.target as HTMLInputElement).files; if (f?.length) run(() => fromFileList(f)); });
-$("copy").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(PATH); $("copy").textContent = "Copied"; setTimeout(() => ($("copy").textContent = "Copy"), 1500); }
-  catch { getSelection()?.selectAllChildren($("path")); }
-});
 const drop = $("drop");
 drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
 drop.addEventListener("dragleave", () => drop.classList.remove("over"));
