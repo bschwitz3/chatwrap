@@ -11,7 +11,7 @@ import { themeButton, bindTheme } from "./theme";
 import "./landing.css";
 
 // Set COFFEE_URL to a Stripe Payment Link / Buy Me a Coffee page; the button stays hidden while empty.
-const COFFEE_URL = "";
+const COFFEE_URL = "https://buy.stripe.com/9B614n50u0EE4hfbHt0RG00";
 const coffee = (cls = "coffee") => COFFEE_URL ? `<a class="${cls}" href="${COFFEE_URL}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13v5a6 6 0 01-6 6H10a6 6 0 01-6-6zM17 10h1.5a2.5 2.5 0 010 5H17" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 2.5c0 1.5 1.5 1.5 1.5 3M12 2.5c0 1.5 1.5 1.5 1.5 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Buy me a coffee</a>` : "";
 const PATH = "~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared";
 const landing = document.getElementById("landing")!;
@@ -163,6 +163,7 @@ function show() {
   document.body.classList.add("in-story");
   mountStory(storyEl, hideNames(base, hidden), {
     hidden,
+    coffeeUrl: COFFEE_URL,
     onHide: (h: Set<string>) => { hidden = h; show(); },
     onRestart: () => { location.hash = ""; location.reload(); },
   });

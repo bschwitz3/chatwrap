@@ -283,6 +283,7 @@ safe(() => chats.push({ id: "bye", title: "That's a wrap", icon: iconAv("flag"),
     txt(`Your top emoji: ${D.my_top[0].term}. Your top group: ${esc(D.groups_top[0].name)}. Your night owl: ${esc(D.night.top[0].name)}.`),
     txt("Everything was counted inside this browser tab. Nothing was uploaded, and closing the tab erases it."),
     out("see you next year 👋"),
+    ...(opts.coffeeUrl ? [txt(`Enjoyed it? Chatwrap is free and made by one person. <a class="coffee-link" href="${opts.coffeeUrl}" target="_blank" rel="noopener">Buy me a coffee ☕</a>`)] : []),
   ] }));
 
 // ---------- year chart ----------

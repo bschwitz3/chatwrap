@@ -156,3 +156,6 @@ dialog p { margin: 0 0 12px; color: var(--mute); font-size: 14px; }
 .dlg-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .dlg-actions button { border: 0; border-radius: 999px; padding: 9px 18px; background: var(--raise2); cursor: pointer; font-weight: 600; }
 .dlg-actions .go { background: var(--green); color: #0b141a; }
+
+.coffee-link { display: inline-block; margin-top: 8px; padding: 7px 14px; border-radius: 999px; background: var(--green); color: #0b141a; font-weight: 600; text-decoration: none; }
+.coffee-link:hover { filter: brightness(1.08); }
