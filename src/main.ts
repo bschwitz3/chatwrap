@@ -8,10 +8,14 @@ import { hideNames } from "./hide";
 import { playIntro, showOpening } from "./intro";
 import { mountShowcase } from "./showcase";
 import { themeButton, bindTheme } from "./theme";
+import "@fontsource-variable/bricolage-grotesque/opsz.css";
+import "@fontsource/figtree/400.css";
+import "@fontsource/figtree/500.css";
+import "@fontsource/figtree/600.css";
 import "./landing.css";
 
 // Set COFFEE_URL to a Stripe Payment Link / Buy Me a Coffee page; the button stays hidden while empty.
-const COFFEE_URL = "https://buy.stripe.com/9B614n50u0EE4hfbHt0RG00";
+const COFFEE_URL = "https://buy.stripe.com/00w3cveB4afe297aDp0RG01";
 const coffee = (cls = "coffee") => COFFEE_URL ? `<a class="${cls}" href="${COFFEE_URL}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13v5a6 6 0 01-6 6H10a6 6 0 01-6-6zM17 10h1.5a2.5 2.5 0 010 5H17" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 2.5c0 1.5 1.5 1.5 1.5 3M12 2.5c0 1.5 1.5 1.5 1.5 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Buy me a coffee</a>` : "";
 const PATH = "~/Library/Group Containers/group.net.whatsapp.WhatsApp.shared";
 const landing = document.getElementById("landing")!;
@@ -81,7 +85,7 @@ landing.innerHTML = `
     <input type="file" id="pick" webkitdirectory multiple hidden>
   </section>
 </main>
-<footer class="land-foot"><span>Not affiliated with WhatsApp or Meta. Works best in Chrome or Safari on a laptop.</span>${coffee()}</footer>`;
+<footer class="land-foot"><span>Not affiliated with WhatsApp or Meta. Works best in Chrome or Safari on a laptop. <a href="/legal.html">Imprint &amp; privacy</a></span>${coffee()}</footer>`;
 
 const $ = (id: string) => document.getElementById(id)!;
 const status = (msg: string, err = false) => { $("status").textContent = msg; $("status").classList.toggle("err", err); };

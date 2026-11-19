@@ -18,7 +18,7 @@
   --warn: #103529;
   --shadow: #000b;
   --dim: .55;
-  --l-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --l-display: "Bricolage Grotesque Variable", "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
   --l-body: "Figtree", "Segoe UI", system-ui, sans-serif;
   color-scheme: dark;
 }
@@ -239,3 +239,5 @@ summary { cursor: pointer; color: var(--l-ink); }
 .coffee:hover { border-color: var(--l-accent); }
 .coffee svg { width: 18px; height: 18px; color: var(--l-accent-ink); }
 .land-foot { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; }
+.land-foot a { color: var(--l-mute); }
+.land-foot a:hover { color: var(--l-ink); }
