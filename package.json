@@ -18,5 +18,12 @@
     "@fontsource-variable/bricolage-grotesque": "^5.1.1",
     "@fontsource/figtree": "^5.1.1",
     "sql.js": "^1.11.0"
+  },
+  "description": "Your year in chats, Wrapped. A WhatsApp year-in-review computed entirely in your browser.",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://chat-wrap.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bschwitz3/chatwrap"
   }
 }

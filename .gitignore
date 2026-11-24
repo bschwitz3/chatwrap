@@ -6,3 +6,6 @@ dist
 *.sqlite-wal
 *.sqlite-shm
 .env*
+
+# private research notes, not published
+docs/research/
