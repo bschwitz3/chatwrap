@@ -13,6 +13,10 @@ import "@fontsource/figtree/400.css";
 import "@fontsource/figtree/500.css";
 import "@fontsource/figtree/600.css";
 import "./landing.css";
+import { inject } from "@vercel/analytics";
+
+// Anonymous page-visit counts only (no cookies). Chat data never reaches this: it is never sent anywhere.
+inject({ mode: import.meta.env.DEV ? "development" : "production" });
 
 // Set COFFEE_URL to a Stripe Payment Link / Buy Me a Coffee page; the button stays hidden while empty.
 const COFFEE_URL = "https://buy.stripe.com/00w3cveB4afe297aDp0RG01";

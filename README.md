@@ -6,7 +6,7 @@
 
 ## Your chats never leave your device
 
-Chatwrap is a static website with no backend. When you connect your WhatsApp folder, your browser reads the files and computes every stat inside the open tab. Nothing is uploaded, nothing is stored, and there are no cookies, analytics or trackers.
+Chatwrap is a static website with no backend. When you connect your WhatsApp folder, your browser reads the files and computes every stat inside the open tab. Nothing is uploaded and nothing is stored. There are no cookies or trackers; the site only counts anonymous page visits with Vercel Web Analytics, which never sees your chats or stats.
 
 Don't take our word for it:
 
